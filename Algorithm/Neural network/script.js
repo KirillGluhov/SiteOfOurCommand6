@@ -145,7 +145,6 @@ document.addEventListener('keypress', function (e) {
     else
         if (e.key.toLowerCase() === 'b') {
 
-
             //const result = brain.likely(d.calculate(), net);
             const result = net.run(d.calculate(true));
             let dd = document.querySelector('.dd');
@@ -172,7 +171,7 @@ document.addEventListener('keypress', function (e) {
                     </div>`;
             }
             
-            dd.innerHTML = `<div class="predict">Скорее всего, ваша цифра... это....     вот эта:..${maxInd}</div>` + st;
+            dd.innerHTML = `<div class="predict">Скорее всего, ваша цифра... это....     вот эта:..<span style="font-size: 30px;color: green">${maxInd}</span></div>` + st;
 
 
 
@@ -180,7 +179,7 @@ document.addEventListener('keypress', function (e) {
             //<div class="val">${values[i]}</div>
         }
         else {
-            vector = d.calculate(true);
+            vector = d.calculate(false);
             switch (e.key) {
 
                 case '1':
@@ -270,6 +269,5 @@ document.addEventListener('keypress', function (e) {
                     console.log(train_data)
                     break
             }
-            d.clear();
         }
 })
