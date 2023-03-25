@@ -10,7 +10,7 @@ function download(content, fileName, contentType) {
 
 function DCanvas(el) {
     const ctx = el.getContext('2d');
-    const pixel = 20;
+    const pixel = 10;
 
     let is_mouse_down = false;
 
@@ -133,9 +133,22 @@ let vector = [];
 const d = new DCanvas(document.getElementById('canv'));
 
 //train
-let net = new brain.NeuralNetwork();
-net.train(train_data, { log: true });
+//let net = new brain.NeuralNetwork();
+//net.train(train_data, { log: true, iterations:500 });
 
+
+function addNet(input) {
+
+    let reader = new FileReader();
+
+    reader.onload = (event) => {
+        netJson = JSON.parse(event.target.result);
+        net = new brain.NeuralNetwork().fromJSON(netJson);
+        }
+
+    reader.readAsText(input.files[0]);
+
+}
 
 
 document.addEventListener('keypress', function (e) {
@@ -155,9 +168,7 @@ document.addEventListener('keypress', function (e) {
             let st = '';
             for (let i = 0; i < val.length; i++) {
                 let full = val[i].toFixed(2);
-                console.log(full);
                 let full_procent = val[i] * 100;
-                let empty = 1 - full;
                 let empty_procent = 100 - full_procent;
 
                 if(val[i]>maxValue){
@@ -265,9 +276,11 @@ document.addEventListener('keypress', function (e) {
                 case 'j':
                     //train
                     jsonData = JSON.stringify(train_data)
-                    download(jsonData, 'json.txt', 'text/plain');
-                    console.log(train_data)
+                    jsonNet = JSON.stringify(net)
+                    download(jsonData, 'jsonData.txt', 'text/plain');
+                    download(jsonNet, 'jsonNet.json', 'text/plain');
                     break
             }
+            d.clear();
         }
 })
