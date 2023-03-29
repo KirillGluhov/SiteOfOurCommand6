@@ -105,76 +105,21 @@ function makeGrid(height, width)
 function findPath (matrix, start, end) {
 
     let currentNode = end;
-    let i = end.f;
 
-    while (currentNode.x != start.x || currentNode.y != start.y)
+    while (currentNode != start)
     {
-        if (currentNode.f == i && cells[currentNode.x][currentNode.y] != "wall")
+        if (currentNode != end)
         {
-            if (currentNode != end)
-            {
-                cells[currentNode.x][currentNode.y] == "path";
-                let ctx = canvas.getContext("2d");
-                ctx.clearRect(currentNode.y * sizeOfCell, currentNode.x * sizeOfCell, sizeOfCell, sizeOfCell);
-                drawCell(currentNode.y, currentNode.x, "path", sizeOfCell, ctx);
-            }
-
-            if (currentNode.x+1 < height && matrix[currentNode.x+1][currentNode.y].f == i-1)
-            {
-                currentNode = matrix[currentNode.x+1][currentNode.y];
-            }
-            else if (currentNode.x-1 >= 0 && matrix[currentNode.x-1][currentNode.y].f == i-1)
-            {
-                currentNode = matrix[currentNode.x-1][currentNode.y];
-            }
-            else if (currentNode.y+1 < width && matrix[currentNode.x][currentNode.y+1].f == i-1)
-            {
-                currentNode = matrix[currentNode.x][currentNode.y+1];
-            }
-            else if (currentNode.y-1 >= 0 && matrix[currentNode.x][currentNode.y-1].f == i-1)
-            {
-                currentNode = matrix[currentNode.x][currentNode.y-1];
-            }
-
-            i--;
+            cells[currentNode.x][currentNode.y] == "path";
+            let ctx = canvas.getContext("2d");
+            ctx.clearRect(currentNode.y * sizeOfCell, currentNode.x * sizeOfCell, sizeOfCell, sizeOfCell);
+            drawCell(currentNode.y, currentNode.x, "path", sizeOfCell, ctx);
         }
-        else
-        {
-            if (currentNode.x+1 < height && matrix[currentNode.x+1][currentNode.y].f == i)
-            {
-                currentNode = matrix[currentNode.x+1][currentNode.y];
-            }
-            else if (currentNode.x-1 >= 0 && matrix[currentNode.x-1][currentNode.y].f == i)
-            {
-                currentNode = matrix[currentNode.x-1][currentNode.y];
-            }
-            else if (currentNode.y+1 < width && matrix[currentNode.x][currentNode.y+1].f == i)
-            {
-                currentNode = matrix[currentNode.x][currentNode.y+1];
-            }
-            else if (currentNode.y-1 >= 0 && matrix[currentNode.x][currentNode.y-1].f == i)
-            {
-                currentNode = matrix[currentNode.x][currentNode.y-1];
-            }
-        }
+        currentNode = currentNode.parent;
     }
 }
 
-function findF (parentNode, childNode) {
-    if (childNode.closed == false)
-    {
-        childNode.f = parentNode.f + 1;
-    }
-    else
-    {
-        childNode.f = min(parentNode.f + 1, childNode.f);
-    }
-
-    return childNode.f;
-
-}
-
-function solveManhattonMetrics (node, matrix) {
+function findNeighbours (node, matrix) {
 
     let nodes = [];
 
@@ -182,8 +127,6 @@ function solveManhattonMetrics (node, matrix) {
     {
         if (cells[node.x+1][node.y] != "wall" && matrix[node.x+1][node.y].closed == false)
         {
-            matrix[node.x+1][node.y].f = findF(matrix[node.x][node.y], matrix[node.x+1][node.y]);
-            matrix[node.x+1][node.y].parent.push(matrix[node.x][node.y]);
             nodes.push(matrix[node.x+1][node.y]);
 
         }
@@ -193,8 +136,6 @@ function solveManhattonMetrics (node, matrix) {
     {
         if (cells[node.x-1][node.y] != "wall" && matrix[node.x-1][node.y].closed == false)
         {
-            matrix[node.x-1][node.y].f = findF(matrix[node.x][node.y], matrix[node.x-1][node.y]);
-            matrix[node.x-1][node.y].parent.push(matrix[node.x][node.y]);
             nodes.push(matrix[node.x-1][node.y]);
 
         }
@@ -205,8 +146,6 @@ function solveManhattonMetrics (node, matrix) {
     {
         if (cells[node.x][node.y+1] != "wall" && matrix[node.x][node.y+1].closed == false)
         {
-            matrix[node.x][node.y+1].f = findF(matrix[node.x][node.y], matrix[node.x][node.y+1]);
-            matrix[node.x][node.y+1].parent.push(matrix[node.x][node.y]);
             nodes.push(matrix[node.x][node.y+1]);
         }
 
@@ -216,14 +155,16 @@ function solveManhattonMetrics (node, matrix) {
     {
         if (cells[node.x][node.y-1] != "wall" && matrix[node.x][node.y-1].closed == false)
         {
-            matrix[node.x][node.y-1].f = findF(matrix[node.x][node.y], matrix[node.x][node.y-1]);
-            matrix[node.x][node.y-1].parent.push(matrix[node.x][node.y]);
             nodes.push(matrix[node.x][node.y-1]);
         }
 
     }
 
     return nodes;
+}
+
+function manhattonMetrics(vertex, end) {
+    return (Math.abs(vertex.x - end.x) + Math.abs(vertex.y - end.y));
 }
 
 function createGraph()
@@ -241,9 +182,11 @@ function createGraph()
                 x: i,
                 y: j,
                 f: 0,
+                g: 0,
+                h: 0,
                 closed: false,
                 type: cells[i][j],
-                parent: [],
+                parent: null,
             };
 
             matrix[i][j] = newObject;
@@ -262,7 +205,7 @@ function createGraph()
 
             if (cells[i][j] == "wall")
             {
-                matrix[i][j].f = -1;
+                matrix[i][j].f = -Infinity;
             }
 
         }
@@ -309,6 +252,8 @@ function solveAStar ()
     let open = [];
 
     open.push(start);
+    start.g = 0;
+    start.f = start.g + start.h;
 
     while (open.length > 0)
     {
@@ -330,15 +275,37 @@ function solveAStar ()
         }
 
         let node = open[minIndex];
-        open.splice(minIndex, 1);
         node.closed = true;
 
-        let newArray = solveManhattonMetrics(node, matrix);
+        let newArray = findNeighbours(node, matrix);
 
         for (let i = 0; i < newArray.length; i++)
         {
-            open.push(newArray[i]);
+            let tentativeScore = min.g + 1;
+
+            if (newArray[i].closed == false)
+            {
+                newArray[i].parent = min;
+                newArray[i].g = tentativeScore;
+                newArray[i].f = newArray[i].g + manhattonMetrics(newArray[i], end);
+                let count = 0;
+
+                for (let j = 0; j < open.length; j++)
+                {
+                    if (open[j] == newArray[i])
+                    {
+                        count++;
+                    }
+                }
+
+                if (count == 0)
+                {
+                    open.push(newArray[i]);
+                }
+            }
         }
+
+        open.splice(minIndex, 1);
     }
 
     if (open.length == 0 && end.f == 0)
