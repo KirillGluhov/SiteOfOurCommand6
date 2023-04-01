@@ -100,8 +100,6 @@ function makeGrid(height, width)
 
 }
 
-//////////////////////////////
-
 function findPath (matrix, start, end) {
 
     let currentNode = end;
@@ -313,8 +311,6 @@ function solveAStar ()
         alert("Пути нет");
     }
 }
-
-/////////////////////////////////
 
 let height;
 let width;
