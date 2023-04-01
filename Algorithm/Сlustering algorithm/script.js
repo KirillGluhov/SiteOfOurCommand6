@@ -1,6 +1,6 @@
 "use strict"
 
-let k = 5;
+let k;
 let vertexes = [];
 let centroids = [];
 let canvas = document.getElementById("canvas");
@@ -20,6 +20,16 @@ function solveDistance(firstVertex, secondVertex)
 {
     return Math.sqrt((firstVertex.x - secondVertex.x)**2 + (firstVertex.y - secondVertex.y)**2);
 }
+
+/////////////////////////
+
+function isCorrectSizeOfField(newNumber)
+{
+    if (newNumber > 0 && isFinite(newNumber) && newNumber == Math.trunc(newNumber)) return true;
+    return false;
+}
+
+////////////
 
 function newCentroids (clusters) 
 {
@@ -134,7 +144,7 @@ function kMeans()
 
 }
 
-let allColors = ["#8B0000", "#ADFF2F", "#00FFFF", "#FFD700", "#FF00FF", "#6A5ACD", "#FF6347", "#66CDAA", "#808000", "#FF1493"];
+let allColors = ["#8B0000", "#ADFF2F", "#00FFFF", "#FFD700", "#FF00FF", "#6A5ACD", "#FF6347", "#66CDAA", "#808000", "#FF1493", "33CC99"];
 
 function chooseStyle (color) 
 {
@@ -172,19 +182,43 @@ canvas.addEventListener("click", function(event)
     drawVertexes();
 });
 
-
+let flag = false;
 let buttonToConfirm = document.getElementById("confirmStartingOfProcess");
+let buttonToconfirmK = document.getElementById("confirmSizeK");
+
+buttonToconfirmK.addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        flag = true;
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+
+});
 
 buttonToConfirm.addEventListener("click", function()
 {
-    findCentroids (k);
-    let clusters = kMeans();
-
-    for (let i = 0; i < clusters.length; i++)
+    if (flag)
     {
-        for (let j = 0; j < clusters[i].length; j++)
+        findCentroids (k);
+        let clusters = kMeans();
+
+        for (let i = 0; i < clusters.length; i++)
         {
-            colorVertex(clusters[i][j], i);
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertex(clusters[i][j], i);
+            }
         }
+    }
+    else
+    {
+        alert("Сначала подтвердите ввод k");
     }
 });

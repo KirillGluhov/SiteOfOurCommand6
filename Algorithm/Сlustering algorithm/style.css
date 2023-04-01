@@ -2,6 +2,15 @@ canvas {
     border: 1px solid black;
 }
 
-button {
+.confirm, .inputNumber, .text {
+    display: inline-block;
+}
+
+.inputNumber {
+    width: 30px;
+}
+
+div {
     display: block;
 }
+
