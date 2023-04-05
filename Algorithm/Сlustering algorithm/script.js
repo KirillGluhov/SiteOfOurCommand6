@@ -162,9 +162,34 @@ function colorVertex(vertex, numberOfColor)
 
 function findCentroids (k)
 {
-    for (let i = 0; i < k; i++)
+    let usedVertexes = new Array(vertexes.length).fill(0);
+
+    if (k > vertexes.length)
     {
-        centroids.push(vertexes[Math.floor(Math.random()*vertexes.length)]);
+        alert("Количество кластеров больше числа точек");
+    }
+    else
+    {
+        for (let i = 0; i < k; i++)
+        {
+            let indexOfNewCentroid = Math.floor(Math.random()*vertexes.length);
+
+            if (usedVertexes[indexOfNewCentroid] == 0)
+            {
+                centroids.push(vertexes[indexOfNewCentroid]);
+                usedVertexes[indexOfNewCentroid] = 1;
+            }
+            else
+            {
+                while (usedVertexes[indexOfNewCentroid] != 0)
+                {
+                    indexOfNewCentroid = Math.floor(Math.random()*vertexes.length);
+                }
+            
+                centroids.push(vertexes[indexOfNewCentroid]);
+                usedVertexes[indexOfNewCentroid] = 1;
+            }
+        }
     }
 }
 

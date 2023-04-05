@@ -5,6 +5,47 @@ let allButtons = {
     createLabyrinth: document.getElementById("createLabirinth"),
 }
 
+/*function makeLabyrinth(vertexesInLabyrinth, height, width) 
+{
+    let listOfVertexesWithNeighbours = [];
+    let startVertex = vertexesInLabyrinth[Math.floor(Math.random()*vertexesInLabyrinth.length)];
+    
+    if (startVertex.x + 1 < height)
+    {
+        if ()
+        {
+
+        }
+    }
+
+    if (startVertex.y + 1 < width)
+    {
+        if ()
+        {
+
+        }
+
+    }
+
+    if ()
+    {
+        if ()
+        {
+
+        }
+
+    }
+
+    if ()
+    {
+        if ()
+        {
+
+        }
+
+    }
+}*/
+
 function isCorrectSizeOfField(newNumber)
 {
     if (newNumber > 0 && isFinite(newNumber) && newNumber == Math.trunc(newNumber)) return true;
@@ -367,6 +408,38 @@ allButtons.createLabyrinth.addEventListener("click", function()
     if (isCorrectSizeOfField(height) && isCorrectSizeOfField(width))
     {
         alert("Создание лабиринта");
+
+        let vertexesInLabyrinth = new Array(height/2 - 1).fill(new Array(width/2  - 1));
+
+        let ctx = canvas.getContext("2d");
+
+        for (let i = 0; i < height; i++)
+        {
+            for (let j = 0; j < width; j++)
+            {
+                if ((((i + 1) % 2)  == 0) && (((j + 1) % 2) == 0) && ((i + 1) != height) && ((j + 1) != width))
+                {
+                    cells[i][j] = "empty";
+
+                    vertexesInLabyrinth[(i+1)/2 - 1][(j+1)/2 - 1] = {
+                        visited: false,
+                        numberOfNeighbours: null,
+                        x: (i+1)/2 - 1,
+                        y: (j+1)/2 - 1,
+                    };
+
+                    drawCell(j, i, cells[i][j], sizeOfCell, ctx);
+
+                }
+                else
+                {
+                    cells[i][j] = "wall";
+                    drawCell(j, i, cells[i][j], sizeOfCell, ctx);
+                }
+            }
+        }
+
+        /*makeLabyrinth(vertexesInLabyrinth, height/2  - 1, width/2 - 1);*/
     }
     else 
     {
