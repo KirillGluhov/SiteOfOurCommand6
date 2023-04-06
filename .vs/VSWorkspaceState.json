@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Algorithm"
+    "\\Algorithm",
+    "\\Algorithm\\Neural network"
   ],
+  "SelectedNode": "\\Algorithm\\Neural network\\neuralNetwork.js",
   "PreviewInSolutionExplorer": false
 }

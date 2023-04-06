@@ -131,10 +131,7 @@ function DCanvas(el) {
 
 let vector = [];
 const d = new DCanvas(document.getElementById('canv'));
-
-//train
-//let net = new brain.NeuralNetwork();
-//net.train(train_data, { log: true, iterations:500 });
+let net = new brain.NeuralNetwork();
 
 
 function addNet(input) {
@@ -151,136 +148,52 @@ function addNet(input) {
 }
 
 
+
 document.addEventListener('keypress', function (e) {
     if (e.key.toLowerCase() === 'c') {
         d.clear();
     }
-    else
-        if (e.key.toLowerCase() === 'b') {
+    else if (e.key.toLowerCase() === 'b') {
 
-            //const result = brain.likely(d.calculate(), net);
-            const result = net.run(d.calculate(true));
-            let dd = document.querySelector('.dd');
-            // dd.innerHTML = Object.values(result);
-            let val = Object.values(result);
-            let maxInd = -1
-            let maxValue = -1
-            let st = '';
-            for (let i = 0; i < val.length; i++) {
-                let full = val[i].toFixed(2);
-                let full_procent = val[i] * 100;
-                let empty_procent = 100 - full_procent;
+        const result = net.run(d.calculate(true));
+        let dd = document.querySelector('.dd');
+        // dd.innerHTML = Object.values(result);
+        let val = Object.values(result);
+        let maxInd = -1
+        let maxValue = -1
+        let st = '';
+        for (let i = 0; i < val.length; i++) {
+            let full = val[i].toFixed(2);
+            let full_procent = val[i] * 100;
+            let empty_procent = 100 - full_procent;
 
-                if(val[i]>maxValue){
-                    maxValue = val[i];
-                    maxInd = i;
-                }
+            if (val[i] > maxValue) {
+                maxValue = val[i];
+                maxInd = i;
+            }
 
-                st += `<div class="probabilities">
+            st += `<div class="probabilities">
                     <div class="numbers">${i}</div> 
                     <div class="crossbar"><div class="true" style="width: ${full_procent}%"></div><div class="true">${full}</div><div class="false" style="width: ${empty_procent}%"></div></div>
                     </div>`;
-            }
-            
-            dd.innerHTML = `<div class="predict">Скорее всего, ваша цифра... это....     вот эта:..<span style="font-size: 30px;color: green">${maxInd}</span></div>` + st;
-
-
-
-
-            //<div class="val">${values[i]}</div>
         }
-        else {
-            vector = d.calculate(false);
-            switch (e.key) {
 
-                case '1':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 1: 1 }
-                    })
-                    break
+        dd.innerHTML = `<div class="predict">Скорее всего, ваша цифра... это....     вот эта:..<span style="font-size: 30px;color: green">${maxInd}</span></div>` + st;
 
-                case '2':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 2: 1 }
-                    })
-                    break
-
-                case '3':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 3: 1 }
-                    })
-                    break
-
-                case '4':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 4: 1 }
-                    })
-                    break
-
-                case '5':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 5: 1 }
-                    })
-                    break
-
-                case '6':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 6: 1 }
-                    })
-                    break
-
-                case '7':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 7: 1 }
-                    })
-                    break
-
-                case '8':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 8: 1 }
-                    })
-                    break
-
-                case '9':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 9: 1 }
-                    })
-                    break
-
-                case '0':
-                    //train
-                    train_data.push({
-                        input: vector,
-                        output: { 0: 1 }
-                    })
-                    break
-
-                case 'j':
-                    //train
-                    jsonData = JSON.stringify(train_data)
-                    jsonNet = JSON.stringify(net)
-                    download(jsonData, 'jsonData.txt', 'text/plain');
-                    download(jsonNet, 'jsonNet.json', 'text/plain');
-                    break
-            }
-            d.clear();
-        }
+    }
+    else if (e.key.toLowerCase() === 'j') {
+        jsonData = JSON.stringify(train_data)
+        jsonNet = JSON.stringify(net)
+        download(jsonData, 'jsonData.txt', 'text/plain');
+        download(jsonNet, 'jsonNet.json', 'text/plain');
+    }
+    else if (/[0-9]/.test(e.key)) {
+        vector = d.calculate(false);
+        // train
+        train_data.push({
+            input: vector,
+            output: { [e.key]: 1 }
+        });
+        d.clear();
+    }
 })
