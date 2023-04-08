@@ -21,15 +21,11 @@ function solveDistance(firstVertex, secondVertex)
     return Math.sqrt((firstVertex.x - secondVertex.x)**2 + (firstVertex.y - secondVertex.y)**2);
 }
 
-/////////////////////////
-
 function isCorrectSizeOfField(newNumber)
 {
     if (newNumber > 0 && isFinite(newNumber) && newNumber == Math.trunc(newNumber)) return true;
     return false;
 }
-
-////////////
 
 function newCentroids (clusters) 
 {
@@ -158,6 +154,12 @@ function colorVertex(vertex, numberOfColor)
     ctx.arc(vertex.x, vertex.y, 5, 0, 2 * Math.PI)
     ctx.fillStyle = chooseStyle(numberOfColor);
     ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(vertex.x, vertex.y);
+    ctx.lineTo(centroids[numberOfColor].x, centroids[numberOfColor].y);
+    ctx.stroke();
+
 }
 
 function findCentroids (k)
