@@ -209,27 +209,13 @@ canvas.addEventListener("click", function(event)
 
 let flag = false;
 let buttonToConfirm = document.getElementById("confirmStartingOfProcess");
-let buttonToconfirmK = document.getElementById("confirmSizeK");
 
-buttonToconfirmK.addEventListener("click", function()
+buttonToConfirm.addEventListener("click", function()
 {
     k = document.getElementById("size").value;
     k = +k;
 
     if (isCorrectSizeOfField(k))
-    {
-        flag = true;
-    }
-    else
-    {
-        alert("Размер поля k некорректно");
-    }
-
-});
-
-buttonToConfirm.addEventListener("click", function()
-{
-    if (flag)
     {
         findCentroids (k);
         let clusters = kMeans();
@@ -244,6 +230,6 @@ buttonToConfirm.addEventListener("click", function()
     }
     else
     {
-        alert("Сначала подтвердите ввод k");
+        alert("Размер поля k некорректно");
     }
 });

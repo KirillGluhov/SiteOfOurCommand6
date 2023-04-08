@@ -5,46 +5,152 @@ let allButtons = {
     createLabyrinth: document.getElementById("createLabirinth"),
 }
 
-/*function makeLabyrinth(vertexesInLabyrinth, height, width) 
+function makeLabyrinth(vertexesInLabyrinth, height, width) 
 {
+    let ctx = canvas.getContext("2d");
     let listOfVertexesWithNeighbours = [];
-    let startVertex = vertexesInLabyrinth[Math.floor(Math.random()*vertexesInLabyrinth.length)];
-    
-    if (startVertex.x + 1 < height)
+
+    let x = Math.floor(Math.random() * (height/2)) * 2;
+    let y = Math.floor(Math.random() * (width/2)) * 2;
+
+    cells[x][y] = "empty";
+    drawCell(y, x, cells[x][y], sizeOfCell, ctx);
+    vertexesInLabyrinth[x][y].type = "empty";
+
+    if (y - 2 >= 0)
     {
-        if ()
-        {
-
-        }
-    }
-
-    if (startVertex.y + 1 < width)
-    {
-        if ()
-        {
-
-        }
+        listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x][y-2]);
 
     }
 
-    if ()
+    if (y + 2 < width)
     {
-        if ()
-        {
-
-        }
+        listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x][y+2]);
 
     }
 
-    if ()
+    if (x - 2 >= 0)
     {
-        if ()
+        listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x-2][y]);
+
+    }
+
+    if (x + 2 < width)
+    {
+        listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x+2][y]);
+
+    }
+
+    while (listOfVertexesWithNeighbours.length > 0)
+    {
+        let index = Math.floor(Math.random()*listOfVertexesWithNeighbours.length);
+
+        if (listOfVertexesWithNeighbours[index].type != "wall")
         {
+            index = -1;
+
+            for (let i = 0; i < listOfVertexesWithNeighbours.length; i++)
+            {
+                if (listOfVertexesWithNeighbours[i].type == "wall")
+                {
+                    index = i;
+                    break;
+                }
+            }
 
         }
 
+        if (index == -1)
+        {
+            return;
+        }
+
+        let vertex = listOfVertexesWithNeighbours[index];
+        x = vertex.x;
+        y = vertex.y;
+
+        cells[x][y] = "empty";
+        drawCell(y, x, cells[x][y], sizeOfCell, ctx);
+        vertexesInLabyrinth[x][y].type = "empty";
+
+        listOfVertexesWithNeighbours.splice(index, 1);
+
+        let direction = ["north", "south", "east", "west"];
+
+        while (direction.length > 0)
+        {
+            let directionIndex = Math.floor(Math.random()*direction.length);
+
+            if (direction[directionIndex] == "north")
+            {
+                if (y-2 >= 0 && cells[x][y-2] == "empty")
+                {
+                    cells[x][y-1] = "empty";
+                    drawCell(y-1, x, "empty", sizeOfCell, ctx);
+                    vertexesInLabyrinth[x][y-1].type = "empty";
+                    direction = [];
+                }
+            }
+            else if (direction[directionIndex] == "south")
+            {
+                if (y+2 < width && cells[x][y+2] == "empty")
+                {
+                    cells[x][y+1] = "empty";
+                    drawCell(y+1, x, "empty", sizeOfCell, ctx);
+                    vertexesInLabyrinth[x][y+1].type = "empty";
+                    direction = [];
+                }
+
+            }
+            else if (direction[directionIndex] == "west")
+            {
+                if (x-2 >= 0 && cells[x-2][y] == "empty")
+                {
+                    cells[x-1][y] = "empty";
+                    drawCell(y, x-1, "empty", sizeOfCell, ctx);
+                    vertexesInLabyrinth[x-1][y].type = "empty";
+                    direction = [];
+                }
+
+            }
+            else if (direction[directionIndex] == "east")
+            {
+                if (x+2 < height && cells[x+2][y] == "empty")
+                {
+                    cells[x+1][y] = "empty";
+                    drawCell(y, x+1, "empty", sizeOfCell, ctx);
+                    vertexesInLabyrinth[x+1][y].type = "empty";
+                    direction = [];
+                }
+            }
+            
+            direction.splice(directionIndex, 1);
+
+        }
+
+        if (y - 2 >= 0 && cells[x][y-2] == "wall")
+        {
+            listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x][y-2]);
+        }
+
+        if (y + 2 < width && cells[x][y+2] == "wall")
+        {
+            listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x][y+2]);
+        }
+
+        if (x - 2 >= 0 && cells[x-2][y] == "wall")
+        {
+            listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x-2][y]);
+        }
+
+        if (x + 2 < width && cells[x+2][y] == "wall")
+        {
+            listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x+2][y]);
+        }
+
+
     }
-}*/
+}
 
 function isCorrectSizeOfField(newNumber)
 {
@@ -359,7 +465,7 @@ let canvas;
 let start;
 let end;
 
-let newButton;
+let newButton = document.createElement("button");
 let cells;
 let sizeOfCell = 20;
 
@@ -384,7 +490,6 @@ allButtons.confirm.addEventListener("click", function()
         }
         makeGrid(height, width);
 
-        newButton = document.createElement("button");
         let newDiv = document.createElement("div");
 
         newDiv.className = "secondPart";
@@ -392,10 +497,6 @@ allButtons.confirm.addEventListener("click", function()
         makeButton(newButton, "confirmCells", "Подтвердить ввод клеток", newDiv);
 
         document.body.appendChild(newDiv);
-
-        newButton.addEventListener("click", function() {
-            solveAStar();
-        });
     }
     else 
     {
@@ -403,46 +504,40 @@ allButtons.confirm.addEventListener("click", function()
     }
 });
 
-allButtons.createLabyrinth.addEventListener("click", function()
+allButtons.createLabyrinth.addEventListener("click", function() 
 {
     if (isCorrectSizeOfField(height) && isCorrectSizeOfField(width))
     {
-        alert("Создание лабиринта");
-
-        let vertexesInLabyrinth = new Array(height/2 - 1).fill(new Array(width/2  - 1));
-
         let ctx = canvas.getContext("2d");
+        let vertexesInLabyrinth = new Array(height);
 
         for (let i = 0; i < height; i++)
         {
+            vertexesInLabyrinth[i] = new Array(width);
+
             for (let j = 0; j < width; j++)
             {
-                if ((((i + 1) % 2)  == 0) && (((j + 1) % 2) == 0) && ((i + 1) != height) && ((j + 1) != width))
-                {
-                    cells[i][j] = "empty";
+                cells[i][j] = "wall";
+                drawCell(j, i, cells[i][j], sizeOfCell, ctx);
 
-                    vertexesInLabyrinth[(i+1)/2 - 1][(j+1)/2 - 1] = {
-                        visited: false,
-                        numberOfNeighbours: null,
-                        x: (i+1)/2 - 1,
-                        y: (j+1)/2 - 1,
-                    };
+                vertexesInLabyrinth[i][j] = {
+                    x: i,
+                    y: j,
+                    type: cells[i][j],
 
-                    drawCell(j, i, cells[i][j], sizeOfCell, ctx);
+                };
 
-                }
-                else
-                {
-                    cells[i][j] = "wall";
-                    drawCell(j, i, cells[i][j], sizeOfCell, ctx);
-                }
             }
         }
-
-        /*makeLabyrinth(vertexesInLabyrinth, height/2  - 1, width/2 - 1);*/
+                
+        makeLabyrinth(vertexesInLabyrinth, height, width);
     }
     else 
     {
         alert("Создание лабиринта невозможно. Сначало введите корректные значения и подтвердите выбор");
     }
+});
+
+newButton.addEventListener("click", function() {
+    solveAStar();
 });
