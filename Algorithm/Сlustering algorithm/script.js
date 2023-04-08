@@ -16,9 +16,24 @@ function drawVertexes ()
     });
 }
 
-function solveDistance(firstVertex, secondVertex)
+function solveDistance(firstVertex, secondVertex, color)
 {
-    return Math.sqrt((firstVertex.x - secondVertex.x)**2 + (firstVertex.y - secondVertex.y)**2);
+    
+    switch (color) {
+        case 0:
+            return Math.sqrt((firstVertex.x - secondVertex.x)**2 + (firstVertex.y - secondVertex.y)**2); // евклидово
+        case 1:
+            return (firstVertex.x - secondVertex.x)**2 + (firstVertex.y - secondVertex.y)**2; //квадрат евклидова
+        case 2:
+            return Math.abs(firstVertex.x - secondVertex.x) + Math.abs(firstVertex.y - secondVertex.y); // манхэттенское
+        case 3:
+            return Math.max(Math.abs(firstVertex.x - secondVertex.x) + Math.abs(firstVertex.y - secondVertex.y)); // чебышева
+        case 4:
+            let answer = (firstVertex.x - secondVertex.x)**2 + (firstVertex.y - secondVertex.y)**2;
+            return Math.pow(answer, 0.2); //степенное расстояние для r = 5, p = 2
+        default:
+            break;
+    }
 }
 
 function isCorrectSizeOfField(newNumber)
@@ -54,7 +69,7 @@ function newCentroids (clusters)
 
 }
 
-function kMeans()
+function kMeans(color)
 {
     let oldClusters = new Array(k);
 
@@ -79,7 +94,7 @@ function kMeans()
 
             for (let j = 0; j < centroids.length; j++)
             {
-                let distance = solveDistance(vertexes[i], centroids[j]);
+                let distance = solveDistance(vertexes[i], centroids[j], color);
 
                 if (distance < minDistance)
                 {
@@ -140,30 +155,67 @@ function kMeans()
 
 }
 
-let allColors = ["#8B0000", "#ADFF2F", "#00FFFF", "#FFD700", "#FF00FF", "#6A5ACD", "#FF6347", "#66CDAA", "#808000", "#FF1493", "33CC99"];
+let allColors = ["#000000","#FFFFFF", "#8B0000", "#ADFF2F", "#00FFFF", "#FFD700", "#FF00FF", "#6A5ACD", "#FF6347", "#66CDAA", "#808000", "#FF1493", "33CC99"];
 
 function chooseStyle (color) 
 {
     return allColors[color];
-
 }
 
-function colorVertex(vertex, numberOfColor)
+function colorVertex(vertex, numberOfColor, color)
 {
-    ctx.beginPath();
-    ctx.arc(vertex.x, vertex.y, 5, 0, 2 * Math.PI)
-    ctx.fillStyle = chooseStyle(numberOfColor);
-    ctx.fill();
+    
 
-    ctx.beginPath();
-    ctx.moveTo(vertex.x, vertex.y);
-    ctx.lineTo(centroids[numberOfColor].x, centroids[numberOfColor].y);
-    ctx.stroke();
+    switch (color) {
+        case 0:
+            ctx.beginPath();
+            ctx.arc(vertex.x, vertex.y, 10, 0, 1* Math.PI);
+            ctx.fillStyle = "lime";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(vertex.x, vertex.y, 5, 0, 1 * Math.PI)
+            ctx.fillStyle = chooseStyle(numberOfColor);
+            ctx.fill();
+            break;
+        case 1:
+            ctx.beginPath();
+            ctx.arc(vertex.x, vertex.y, 10, 1 * Math.PI, 0)
+            ctx.fillStyle = "tomato";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(vertex.x, vertex.y, 5, 1 * Math.PI, 0)
+            ctx.fillStyle = chooseStyle(numberOfColor);
+            ctx.fill();
+            break;
+        case 2:
+            ctx.strokeStyle = "black";
+            break;
+        case 3:
+            ctx.strokeStyle = "magenta";
+            break;
+        case 4:
+            ctx.strokeStyle = "aqua";
+            break;
+    
+        default:
+            break;
+    }
+
+    if (color > 1)
+    {
+        ctx.beginPath();
+        ctx.moveTo(vertex.x, vertex.y);
+        ctx.lineTo(centroids[numberOfColor].x, centroids[numberOfColor].y);
+        ctx.stroke();
+    }
 
 }
 
 function findCentroids (k)
 {
+    centroids = [];
     let usedVertexes = new Array(vertexes.length).fill(0);
 
     if (k > vertexes.length)
@@ -219,14 +271,17 @@ buttonToConfirm.addEventListener("click", function()
 
     if (isCorrectSizeOfField(k))
     {
-        findCentroids (k);
-        let clusters = kMeans();
-
-        for (let i = 0; i < clusters.length; i++)
+        for (let color = 0; color < 5; color++)
         {
-            for (let j = 0; j < clusters[i].length; j++)
+            findCentroids (k);
+            let clusters = kMeans(color);
+
+            for (let i = 0; i < clusters.length; i++)
             {
-                colorVertex(clusters[i][j], i);
+                for (let j = 0; j < clusters[i].length; j++)
+                {
+                    colorVertex(clusters[i][j], i, color);
+                }
             }
         }
     }
