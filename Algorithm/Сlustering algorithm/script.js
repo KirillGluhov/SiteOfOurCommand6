@@ -155,7 +155,7 @@ function kMeans(color)
 
 }
 
-let allColors = ["#000000","#FFFFFF", "#8B0000", "#ADFF2F", "#00FFFF", "#FFD700", "#FF00FF", "#6A5ACD", "#FF6347", "#66CDAA", "#808000", "#FF1493", "33CC99"];
+let allColors = ["black","white", "red", "orange", "#66CDAA", "yellow","magenta","#808080", "green", "cyan", "blue", "gold", "tomato", "purple"];
 
 function chooseStyle (color) 
 {
