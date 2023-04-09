@@ -232,6 +232,10 @@ function makeGrid(height, width)
         {
             cells[j][i] = "empty";
         }
+        else if (cells[j][i] == "path")
+        {
+            cells[j][i] = "empty";
+        }
 
         drawCell(i, j, cells[j][i], sizeOfCell, ctx);
 
@@ -314,6 +318,7 @@ function manhattonMetrics(vertex, end) {
 
 function createGraph()
 {
+    let ctx = canvas.getContext("2d");
     let numberOfStarts = 0;
     let numberOfEnds = 0;
     let matrix = [];
@@ -335,6 +340,11 @@ function createGraph()
             };
 
             matrix[i][j] = newObject;
+
+            if (cells[i][j] == "empty")
+            {
+                drawCell(j, i, cells[i][j], sizeOfCell, ctx);
+            }
 
             if (cells[i][j] == "start")
             {
