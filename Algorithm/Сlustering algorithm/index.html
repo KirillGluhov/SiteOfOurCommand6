@@ -5,7 +5,14 @@
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
-        <p>Пустой алгоритм</p>
-
+        <div>
+            <div class="textInFullSize">Внешний полукруг снизу лаймовый, если евклидово расстояние, томатный, если квадрат евклидова расстояние. Внутренние полукруги отвечают за принадлежность к кластеру</div>
+            <div class="textInFullSize">Цвет отрезков: Чёрный - манхэттонское расстояние, розовый - расстояние Чебышева, циановый - степенное расстояние</div>
+            <div class="text">Ввод количества кластеров</div>
+            <input class ="inputNumber" id ="size" type="text"/>
+            <button class="confirm" id="confirmStartingOfProcess">Подтвердить ввод точек</button>
+        </div>
+        <canvas id="canvas" width="1000" height="1000"></canvas>
+        <script src="script.js"></script>
     </body>
 </html>

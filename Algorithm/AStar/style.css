@@ -1,0 +1,7 @@
+.text {
+    display: inline-flex;
+}
+
+.inputNumber {
+    width: 30px;
+}
