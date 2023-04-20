@@ -102,6 +102,41 @@ class NeuralNetwork {
         }
         return total_error;
     }
+
+    runNet(input, netJSON) {
+        const output = [];
+
+        // Calculate the output for each layer
+        for (let layerIdx = 0; layerIdx < netJSON.layers.length; layerIdx++) {
+            const layer = netJSON.layers[layerIdx];
+            const layerOutput = [];
+
+            // Calculate the output for each neuron in the layer
+            for (let neuronIdx = 0; neuronIdx < layer.length; neuronIdx++) {
+                const neuron = layer[neuronIdx];
+                let neuronOutput = neuron.bias;
+
+                // Calculate the weighted sum of the inputs
+                for (let i = 0; i < neuron.weights.length; i++) {
+                    neuronOutput += neuron.weights[i] * input[i];
+                }
+
+                // Apply the activation function
+                neuronOutput = 1 / (1 + Math.exp(-neuronOutput));
+                layerOutput.push(neuronOutput);
+            }
+
+            input = layerOutput;
+            output.push(layerOutput);
+        }
+
+        return output[output.length - 1];
+    }
+
+
+
+
+
     }
 
 

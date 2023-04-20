@@ -132,6 +132,9 @@ function DCanvas(el) {
 let vector = [];
 const d = new DCanvas(document.getElementById('canv'));
 let net = new brain.NeuralNetwork();
+let netJson;
+let train_data = [];
+let weights = [];
 
 
 function addNet(input) {
@@ -140,6 +143,7 @@ function addNet(input) {
 
     reader.onload = (event) => {
         netJson = JSON.parse(event.target.result);
+
         net = new brain.NeuralNetwork().fromJSON(netJson);
         }
 
@@ -155,7 +159,15 @@ document.addEventListener('keypress', function (e) {
     }
     else if (e.key.toLowerCase() === 'b') {
 
-        const result = net.run(d.calculate(true));
+       // net.train(train_data, { log: true,/* iterations:500*/ });
+
+       
+
+        let nn = new NeuralNetwork(2, 2, 2, hidden_layer_weights = [0.15, 0.2, 0.25, 0.3], hidden_layer_bias = 0.35, output_layer_weights = [0.4, 0.45, 0.5, 0.55], output_layer_bias = 0.6);
+
+        //const result = nn.runNet(d.calculate(true),netJson)
+
+        const result = net.run(d.calculate(false));
         let dd = document.querySelector('.dd');
         // dd.innerHTML = Object.values(result);
         let val = Object.values(result);
