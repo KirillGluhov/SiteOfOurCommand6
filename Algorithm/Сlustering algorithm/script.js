@@ -29,8 +29,8 @@ function solveDistance(firstVertex, secondVertex, color)
         case 3:
             return Math.max(Math.abs(firstVertex.x - secondVertex.x) + Math.abs(firstVertex.y - secondVertex.y)); // чебышева
         case 4:
-            let answer = (firstVertex.x - secondVertex.x)**2 + (firstVertex.y - secondVertex.y)**2;
-            return Math.pow(answer, 0.2); //степенное расстояние для r = 5, p = 2
+            let answer = (Math.abs(firstVertex.x - secondVertex.x))**3 + (Math.abs(firstVertex.y - secondVertex.y))**3;
+            return Math.pow(answer, 0.2); //степенное расстояние для r = 5, p = 3
         default:
             break;
     }
@@ -67,6 +67,253 @@ function newCentroids (clusters)
 
     return answer;
 
+}
+
+function findDistance(first, second, currentClasters, color)
+{
+    switch (color) {
+        case 5:
+            {
+                let min = Infinity;
+
+                for (let i = 0; i < currentClasters[first].length; i++)
+                {
+                    for (let j = 0; j < currentClasters[second].length; j++)
+                    {
+                        let distance = solveDistance(currentClasters[first][i], currentClasters[second][j], 0);
+
+                        if (distance < min)
+                        {
+                            min = distance;
+                        }
+
+                    }
+                }
+                return min;
+                //Метод одиночной связи
+            }
+            return;
+        case 6:
+            {
+                let max = -Infinity;
+
+                for (let i = 0; i < currentClasters[first].length; i++)
+                {
+                    for (let j = 0; j < currentClasters[second].length; j++)
+                    {
+                        let distance = solveDistance(currentClasters[first][i], currentClasters[second][j], 0);
+
+                        if (distance > max)
+                        {
+                            max = distance;
+                        }
+
+                    }
+                }
+                return max;
+                //Метод полной связи
+            }
+            return;
+        case 7:
+            {
+                let average = 0;
+
+                for (let i = 0; i < currentClasters[first].length; i++)
+                {
+                    for (let j = 0; j < currentClasters[second].length; j++)
+                    {
+                        let distance = solveDistance(currentClasters[first][i], currentClasters[second][j], 0);
+
+                        average += distance;
+                    }
+                }
+                return average/(currentClasters[first].length * currentClasters[second].length);
+                //Метод средней связи
+
+            }
+            return;
+        case 8:
+            {
+                let distanceCentroids;
+                
+                let centroidFirst = {
+                    x: 0,
+                    y: 0,
+                };
+
+                let centroidSecond = {
+                    x: 0,
+                    y: 0,
+                };
+
+                for (let i = 0; i < currentClasters[first].length; i++)
+                {
+                    centroidFirst.x += currentClasters[first][i].x;
+                    centroidFirst.y += currentClasters[first][i].y;
+
+                }
+
+                centroidFirst.x /= currentClasters[first].length;
+                centroidFirst.y /= currentClasters[first].length;
+
+                for (let j = 0; j < currentClasters[second].length; j++)
+                {
+                    centroidSecond.x += currentClasters[second][j].x;
+                    centroidSecond.y += currentClasters[second][j].y;
+
+                }
+
+                centroidSecond.x /= currentClasters[second].length;
+                centroidSecond.y /= currentClasters[second].length;
+
+                distanceCentroids = solveDistance(centroidFirst, centroidSecond, 0);
+                return distanceCentroids;
+                //Центроидный метод
+            }
+            return distanceCentroids;
+        case 9:
+            let distanceCentroids;
+            {
+
+                let centroidFirst = {
+                    x: 0,
+                    y: 0,
+                };
+
+                let centroidSecond = {
+                    x: 0,
+                    y: 0,
+                };
+
+                for (let i = 0; i < currentClasters[first].length; i++)
+                {
+                    centroidFirst.x += currentClasters[first][i].x;
+                    centroidFirst.y += currentClasters[first][i].y;
+
+                }
+
+                centroidFirst.x /= currentClasters[first].length;
+                centroidFirst.y /= currentClasters[first].length;
+
+                for (let j = 0; j < currentClasters[second].length; j++)
+                {
+                    centroidSecond.x += currentClasters[second][j].x;
+                    centroidSecond.y += currentClasters[second][j].y;
+
+                }
+
+                centroidSecond.x /= currentClasters[second].length;
+                centroidSecond.y /= currentClasters[second].length;
+
+                distanceCentroids = solveDistance(centroidFirst, centroidSecond, 0);
+                distanceCentroids *= ((currentClasters[first].length*currentClasters[second].length)/(currentClasters[first].length+currentClasters[second].length));
+                return distanceCentroids;
+                //Метод Уорда
+            }
+            return distanceCentroids;
+        default:
+            break;
+    }
+}
+
+function makeMatrixOfLengthes(currentClasters, color)
+{
+    let matrixes = new Array(currentClasters.length);
+
+    for (let i = 0; i < currentClasters.length; i++)
+    {
+        matrixes[i] = new Array(currentClasters.length);
+
+        for (let j = 0; j < currentClasters.length; j++)
+        {
+            if (j == i)
+            {
+                matrixes[i][j] = Infinity;
+            }
+            else
+            {
+                matrixes[i][j] = findDistance(i, j, currentClasters, color);
+            }
+
+        }
+    }
+
+    return matrixes;
+
+}
+
+function hierarchicalClustering(color, k)
+{
+    let currentClasters = new Array(vertexes.length);
+
+    for (let i = 0; i < vertexes.length; i++)
+    {
+        currentClasters[i] = [vertexes[i]];
+    }
+
+    while (true)
+    {
+        let matrixes = makeMatrixOfLengthes(currentClasters, color);
+        let jNear = new Array(matrixes.length);
+
+        for (let i = 0; i < matrixes.length; i++)
+        {
+            let minDistanceBetweenClusters = Infinity;
+
+            for (let j = 0; j < matrixes[i].length; j++)
+            {
+                if (minDistanceBetweenClusters > matrixes[i][j])
+                {
+                    minDistanceBetweenClusters = matrixes[i][j];
+                    jNear[i] = j;
+                }
+            }
+        }
+
+        let newCurrentClasters = [];
+        let connectedVertexes = new Array(currentClasters.length).fill(0);
+        let size = currentClasters.length;
+
+        for (let i = 0; i < currentClasters.length; i++)
+        {
+            if (size == k)
+            {
+                for (let j = 0; j < currentClasters.length; j++)
+                {
+                    if (connectedVertexes[j] == 0)
+                    {
+                        newCurrentClasters.push(currentClasters[j]);
+                        connectedVertexes[j] = 1;
+                    }
+                }
+
+                return newCurrentClasters;
+            }
+            else if (connectedVertexes[i] == 0 || connectedVertexes[jNear[i]] == 0)
+            {
+                if (connectedVertexes[i] == 0 && connectedVertexes[jNear[i]] == 0)
+                {
+                    let newArray = currentClasters[i].concat(currentClasters[jNear[i]]);
+                    newCurrentClasters.push(newArray);
+                    size--;
+                }
+                else if (connectedVertexes[i] == 0)
+                {
+                    newCurrentClasters.push(currentClasters[i]);
+                }
+                else if (connectedVertexes[jNear[i]] == 0)
+                {
+                    newCurrentClasters.push(currentClasters[jNear[i]]);
+                }
+
+                connectedVertexes[i] = 1;
+                connectedVertexes[jNear[i]] = 1;
+            }
+
+        }
+
+        currentClasters = newCurrentClasters;
+    }
 }
 
 function kMeans(color)
@@ -155,62 +402,28 @@ function kMeans(color)
 
 }
 
-let allColors = ["black","white", "red", "orange", "#66CDAA", "yellow","magenta","#808080", "green", "cyan", "blue", "gold", "tomato", "purple"];
-
-function chooseStyle (color) 
-{
-    return allColors[color];
-}
-
 function colorVertex(vertex, numberOfColor, color)
 {
-    
+    ctx.strokeStyle = color;
 
-    switch (color) {
-        case 0:
-            ctx.beginPath();
-            ctx.arc(vertex.x, vertex.y, 10, 0, 1* Math.PI);
-            ctx.fillStyle = "lime";
-            ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(vertex.x, vertex.y);
+    ctx.lineTo(centroids[numberOfColor].x, centroids[numberOfColor].y);
+    ctx.stroke();
 
-            ctx.beginPath();
-            ctx.arc(vertex.x, vertex.y, 5, 0, 1 * Math.PI)
-            ctx.fillStyle = chooseStyle(numberOfColor);
-            ctx.fill();
-            break;
-        case 1:
-            ctx.beginPath();
-            ctx.arc(vertex.x, vertex.y, 10, 1 * Math.PI, 0)
-            ctx.fillStyle = "tomato";
-            ctx.fill();
+    ctx.beginPath();
+    ctx.arc(vertex.x, vertex.y, 5, 0, 2 * Math.PI)
+    ctx.fillStyle = "black";
+    ctx.fill();
 
-            ctx.beginPath();
-            ctx.arc(vertex.x, vertex.y, 5, 1 * Math.PI, 0)
-            ctx.fillStyle = chooseStyle(numberOfColor);
-            ctx.fill();
-            break;
-        case 2:
-            ctx.strokeStyle = "black";
-            break;
-        case 3:
-            ctx.strokeStyle = "magenta";
-            break;
-        case 4:
-            ctx.strokeStyle = "aqua";
-            break;
-    
-        default:
-            break;
-    }
+}
 
-    if (color > 1)
-    {
-        ctx.beginPath();
-        ctx.moveTo(vertex.x, vertex.y);
-        ctx.lineTo(centroids[numberOfColor].x, centroids[numberOfColor].y);
-        ctx.stroke();
-    }
-
+function colorVertexes(vertex, color)
+{
+    ctx.beginPath();
+    ctx.arc(vertex.x, vertex.y, 5, 0, 2 * Math.PI)
+    ctx.fillStyle = color;
+    ctx.fill();
 }
 
 function findCentroids (k)
@@ -262,26 +475,24 @@ canvas.addEventListener("click", function(event)
 });
 
 let flag = false;
-let buttonToConfirm = document.getElementById("confirmStartingOfProcess");
 
-buttonToConfirm.addEventListener("click", function()
+document.getElementById("euclidian").addEventListener("click", function()
 {
     k = document.getElementById("size").value;
     k = +k;
 
     if (isCorrectSizeOfField(k))
     {
-        for (let color = 0; color < 5; color++)
-        {
-            findCentroids (k);
-            let clusters = kMeans(color);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        findCentroids (k);
+        let clusters = kMeans(0);
+        let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
 
-            for (let i = 0; i < clusters.length; i++)
+        for (let i = 0; i < clusters.length; i++)
+        {
+            for (let j = 0; j < clusters[i].length; j++)
             {
-                for (let j = 0; j < clusters[i].length; j++)
-                {
-                    colorVertex(clusters[i][j], i, color);
-                }
+                colorVertex(clusters[i][j], i, color);
             }
         }
     }
@@ -290,3 +501,236 @@ buttonToConfirm.addEventListener("click", function()
         alert("Размер поля k некорректно");
     }
 });
+
+document.getElementById("squareEuclidian").addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        findCentroids (k);
+        let clusters = kMeans(1);
+        let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
+
+        for (let i = 0; i < clusters.length; i++)
+        {
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertex(clusters[i][j], i, color);
+            }
+        }
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+});
+
+document.getElementById("manhattan").addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        findCentroids (k);
+        let clusters = kMeans(2);
+        let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
+
+        for (let i = 0; i < clusters.length; i++)
+        {
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertex(clusters[i][j], i, color);
+            }
+        }
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+});
+
+document.getElementById("chebyshev").addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        findCentroids (k);
+        let clusters = kMeans(3);
+        let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
+
+        for (let i = 0; i < clusters.length; i++)
+        {
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertex(clusters[i][j], i, color);
+            }
+        }
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+});
+
+document.getElementById("pow").addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        findCentroids (k);
+        let clusters = kMeans(4);
+        let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
+
+        for (let i = 0; i < clusters.length; i++)
+        {
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertex(clusters[i][j], i, color);
+            }
+        }
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+});
+
+////////////////////////////////////////////
+
+document.getElementById("singleConnection").addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let clusters = hierarchicalClustering(5, k);
+
+        for (let i = 0; i < clusters.length; i++)
+        {
+            let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertexes(clusters[i][j], color);
+            }
+        }
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+});
+
+document.getElementById("fullConnection").addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let clusters = hierarchicalClustering(6, k);
+
+        for (let i = 0; i < clusters.length; i++)
+        {
+            let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertexes(clusters[i][j], color);
+            }
+        }
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+});
+
+document.getElementById("averageConnection").addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let clusters = hierarchicalClustering(7, k);
+
+        for (let i = 0; i < clusters.length; i++)
+        {
+            let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertexes(clusters[i][j], color);
+            }
+        }
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+});
+
+document.getElementById("centroid").addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let clusters = hierarchicalClustering(8, k);
+
+        for (let i = 0; i < clusters.length; i++)
+        {
+            let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertexes(clusters[i][j], color);
+            }
+        }
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+});
+
+document.getElementById("ward").addEventListener("click", function()
+{
+    k = document.getElementById("size").value;
+    k = +k;
+
+    if (isCorrectSizeOfField(k))
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let clusters = hierarchicalClustering(9, k);
+
+        for (let i = 0; i < clusters.length; i++)
+        {
+            let color = '#' + (Math.random().toString(16) + '000000').substring(2,8).toUpperCase();
+            for (let j = 0; j < clusters[i].length; j++)
+            {
+                colorVertexes(clusters[i][j], color);
+            }
+        }
+    }
+    else
+    {
+        alert("Размер поля k некорректно");
+    }
+});
+
+

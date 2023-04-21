@@ -6,11 +6,19 @@
     </head>
     <body>
         <div>
-            <div class="textInFullSize">Внешний полукруг снизу лаймовый, если евклидово расстояние, томатный, если квадрат евклидова расстояние. Внутренние полукруги отвечают за принадлежность к кластеру</div>
-            <div class="textInFullSize">Цвет отрезков: Чёрный - манхэттонское расстояние, розовый - расстояние Чебышева, циановый - степенное расстояние</div>
             <div class="text">Ввод количества кластеров</div>
             <input class ="inputNumber" id ="size" type="text"/>
-            <button class="confirm" id="confirmStartingOfProcess">Подтвердить ввод точек</button>
+            <button class="confirm" id="euclidian">Евклидово расстояние (K-средних)</button>
+            <button class="confirm" id="squareEuclidian">Квадрат Евклидова расстояния (K-средних)</button>
+            <button class="confirm" id="manhattan">Манхэттоноское расстояние (K-средних)</button>
+            <button class="confirm" id="chebyshev">Расстояние Чебышева (K-средних)</button>
+            <button class="confirm" id="pow">Степенное расстояние (K-средних)</button>
+            <div></div>
+            <button class="confirm" id="singleConnection">Метод одиночной связи (Иерархическая кластеризация)</button>
+            <button class="confirm" id="fullConnection">Метод полной связи (Иерархическая кластеризация)</button>
+            <button class="confirm" id="averageConnection">Метод средней связи (Иерархическая кластеризация)</button>
+            <button class="confirm" id="centroid">Центроидный метод (Иерархическая кластеризация)</button>
+            <button class="confirm" id="ward">Метод Уорда (Иерархическая кластеризация)</button>
         </div>
         <canvas id="canvas" width="1000" height="1000"></canvas>
         <script src="script.js"></script>

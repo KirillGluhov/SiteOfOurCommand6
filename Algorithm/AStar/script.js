@@ -20,25 +20,21 @@ function makeLabyrinth(vertexesInLabyrinth, height, width)
     if (y - 2 >= 0)
     {
         listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x][y-2]);
-
     }
 
     if (y + 2 < width)
     {
         listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x][y+2]);
-
     }
 
     if (x - 2 >= 0)
     {
         listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x-2][y]);
-
     }
 
-    if (x + 2 < width)
+    if (x + 2 < height)
     {
         listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x+2][y]);
-
     }
 
     while (listOfVertexesWithNeighbours.length > 0)
@@ -100,7 +96,6 @@ function makeLabyrinth(vertexesInLabyrinth, height, width)
                     vertexesInLabyrinth[x][y+1].type = "empty";
                     direction = [];
                 }
-
             }
             else if (direction[directionIndex] == "west")
             {
@@ -143,7 +138,7 @@ function makeLabyrinth(vertexesInLabyrinth, height, width)
             listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x-2][y]);
         }
 
-        if (x + 2 < width && cells[x+2][y] == "wall")
+        if (x + 2 < height && cells[x+2][y] == "wall")
         {
             listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x+2][y]);
         }
