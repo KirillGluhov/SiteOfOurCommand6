@@ -54,6 +54,8 @@ function createTreeDom(obj, dec, dir = "", isChoosen = false) {
             li.innerHTML = `<p style="color:green">${key}</p>`;
             //li.style = "color:red";
         }
+
+        
         let childrenUl;
 
         if (isChoosen && dec != null) {
@@ -69,32 +71,44 @@ function createTreeDom(obj, dec, dir = "", isChoosen = false) {
                 console.log(header);
                 console.log(dec[header])
 
-                if (dec[header] <= value) {
-                    childrenUl = createTreeDom(obj[key], dec, "Left", isChoosen = true);
+                if (Number(dec[header]) <= Number(value)) {
+                    childrenUl = createTreeDom(obj[key], dec, "Left", true);
+
                     //li.classList.add("userDecison");
                 }
                 else {
-                    childrenUl = createTreeDom(obj[key], dec, "Right", isChoosen = true);
+                    childrenUl = createTreeDom(obj[key], dec, "Right", true);
+
                     //li.classList.add("red");
                 }
             }
-            else childrenUl = createTreeDom(obj[key], dec, "", isChoosen = true);
+            else if (key == "YES" && dir == "Left") {
+                childrenUl = createTreeDom(obj[key], dec, "", true);
+            }
+            else if(key == "NO" && dir == "Right") {
+                childrenUl = createTreeDom(obj[key], dec, "", true);
+            }
+            else childrenUl = createTreeDom(obj[key], dec, "", false);
+
         }
-        else childrenUl = createTreeDom(obj[key], dec, "", isChoosen = false);
+        else childrenUl = createTreeDom(obj[key], dec, "", false);
 
         if (childrenUl) {
             li.append(childrenUl);
         }
-
-        ul.append(li);
+        
+         ul.append(li);
 
     }
-    isChoosen = false;
+   
     return ul;
 }
 
 
-function build_tree(data) {
+function build_tree(_data) {
+
+
+    let data = _data
 
     let maxGain = -1;
     let bestSplit = [];
@@ -123,7 +137,7 @@ function build_tree(data) {
             let all_data = []
 
             for (let j = 0; j < data.length; j++) {
-                if (data[j][headers[h]] <= value) {
+                if (Number(data[j][headers[h]]) <= Number(value)) {
                     left.push([j, data[j][headers[headers.length - 1]]])
                 }
                 else right.push([j, data[j][headers[headers.length - 1]]])
@@ -132,7 +146,7 @@ function build_tree(data) {
 
             if (left.length == 0 || right.length == 0) continue
 
-            gain = informationGain(all_data, left, right)
+            let gain = informationGain(all_data, left, right)
             if (gain == -1) {
                 return { [`predict = ${all_data[0][1]}`]: {} }
 
@@ -163,8 +177,8 @@ function build_tree(data) {
 
 
 
-    best_left = [];
-    best_right = [];
+    let best_left = [];
+    let best_right = [];
 
     for (let j = 0; j < bestSplit[0].length; j++) {
         best_left.push(data[bestSplit[0][j][0]])
@@ -224,7 +238,7 @@ for (let title = 0; title < titles.length; title++) {
     titles[title].hidden = true;
 }
 
-let data;
+let dataArr;
 
 button.onclick = function () {
 
@@ -270,55 +284,36 @@ button.onclick = function () {
     });
 
 
-
-
-
-
-    //data - готовый объект в формате csv //
-
-    data = dataArray;
+    dataArr = dataArray;
     // console.log(data);
-
-
 
     //рисует дерево
     let tree = document.querySelector('.tree');
-    createTree(tree, build_tree(data));
+    createTree(tree, build_tree(dataArr));
     // console.log(build_tree(data));
-
-
-
-
-
-
 
 
     // ДЛЯ ТАБЛИЦЫ //
 
     //получение заголовков //
 
-    let headers = data[0];
+    let headers = dataArr[0];
     headers = Object.getOwnPropertyNames(headers);
     // console.log(headers);
-
-
-
 
 
     //получение всех ключей из заданного массива //
 
     let valueOfHeaders = [];
 
-    for (let i = 0; i < data.length; i++) {
-        let tmp = data[i];
+    for (let i = 0; i < dataArr.length; i++) {
+        let tmp = dataArr[i];
 
         for (let value of Object.values(tmp)) {
             valueOfHeaders.push(value);
         }
     }
     // console.log(valueOfHeaders);
-
-
 
 
     //соединения массивов с заголовками и значениями //
@@ -440,7 +435,7 @@ buttonChose.onclick = function () {
     */
 
     let obj = {};
-    let headers = data[0];
+    let headers = dataArr[0];
     headers = Object.getOwnPropertyNames(headers);
 
     for (let i = 0; i < inputDataDec.length; i++) {
@@ -470,7 +465,7 @@ buttonChose.onclick = function () {
 
     document.querySelector('.tree').innerHTML = "";
 
-    createTree(tree, build_tree(data), obj);
+    createTree(tree, build_tree(dataArr), obj);
 }
 
 
