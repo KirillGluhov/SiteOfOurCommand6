@@ -20,25 +20,21 @@ function makeLabyrinth(vertexesInLabyrinth, height, width)
     if (y - 2 >= 0)
     {
         listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x][y-2]);
-
     }
 
     if (y + 2 < width)
     {
         listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x][y+2]);
-
     }
 
     if (x - 2 >= 0)
     {
         listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x-2][y]);
-
     }
 
-    if (x + 2 < width)
+    if (x + 2 < height)
     {
         listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x+2][y]);
-
     }
 
     while (listOfVertexesWithNeighbours.length > 0)
@@ -100,7 +96,6 @@ function makeLabyrinth(vertexesInLabyrinth, height, width)
                     vertexesInLabyrinth[x][y+1].type = "empty";
                     direction = [];
                 }
-
             }
             else if (direction[directionIndex] == "west")
             {
@@ -143,7 +138,7 @@ function makeLabyrinth(vertexesInLabyrinth, height, width)
             listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x-2][y]);
         }
 
-        if (x + 2 < width && cells[x+2][y] == "wall")
+        if (x + 2 < height && cells[x+2][y] == "wall")
         {
             listOfVertexesWithNeighbours.push(vertexesInLabyrinth[x+2][y]);
         }
@@ -183,7 +178,15 @@ function drawCell(x, y, type, cellSize, ctx) {
     }
     else if (type == "path")
     {
-        ctx.fillStyle = "#0000ff";
+      ctx.fillStyle = "#0000ff";
+    }
+    else if (type == "potential")
+    {
+        ctx.fillStyle = "gray";
+    }
+    else if (type == "newCell")
+    {
+        ctx.fillStyle = "magenta";
     }
 
     ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
@@ -251,25 +254,46 @@ function makeGrid(height, width)
 
 }
 
-function findPath (matrix, start, end) {
-
+function findPath(matrix, start, end) {
     let currentNode = end;
-
-    while (currentNode != start)
+    let path = [];
+    let ctx = canvas.getContext("2d");
+    drawCell(start.y, start.x, "start", sizeOfCell, ctx);
+    
+    while (currentNode.x != start.x || currentNode.y != start.y) 
     {
-        if (currentNode != end)
-        {
-            cells[currentNode.x][currentNode.y] == "path";
-            let ctx = canvas.getContext("2d");
-            ctx.clearRect(currentNode.y * sizeOfCell, currentNode.x * sizeOfCell, sizeOfCell, sizeOfCell);
-            drawCell(currentNode.y, currentNode.x, "path", sizeOfCell, ctx);
-        }
-        currentNode = currentNode.parent;
+      path.push(currentNode);
+      currentNode = currentNode.parent;
     }
-}
+    path.push(start);
+    
+    let i = path.length - 2;
+    
+    let timer = setInterval(function() {
+      let node = path[i];
+      cells[node.x][node.y] = "path";
 
-function findNeighbours (node, matrix) {
+      ctx.clearRect(node.y * sizeOfCell, node.x * sizeOfCell, sizeOfCell, sizeOfCell);
+      drawCell(node.y, node.x, "path", sizeOfCell, ctx);
+  
+      if (node.x === end.x && node.y === end.y) 
+      {
+        cells[node.x][node.y] = "end";
+        ctx.clearRect(node.y * sizeOfCell, node.x * sizeOfCell, sizeOfCell, sizeOfCell);
+        drawCell(node.y, node.x, "end", sizeOfCell, ctx);
 
+        pathFound = true;
+        clearInterval(timer);
+        return;
+      }
+      i--;
+    }, 100);
+  }
+  
+
+function findNeighbours (node, matrix, start) {
+
+    let ctx = canvas.getContext("2d");
     let nodes = [];
 
     if (node.x + 1 < height)
@@ -277,6 +301,17 @@ function findNeighbours (node, matrix) {
         if (cells[node.x+1][node.y] != "wall" && matrix[node.x+1][node.y].closed == false)
         {
             nodes.push(matrix[node.x+1][node.y]);
+
+            {
+                let colorIndex = 0;
+                let timer = setInterval(function() {
+                    drawCell(node.y, node.x+1, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
+                    colorIndex++;
+                    if (colorIndex === 2) {
+                        clearInterval(timer);
+                    }
+                }, 30);
+            }
 
         }
     }
@@ -286,6 +321,16 @@ function findNeighbours (node, matrix) {
         if (cells[node.x-1][node.y] != "wall" && matrix[node.x-1][node.y].closed == false)
         {
             nodes.push(matrix[node.x-1][node.y]);
+            {
+                let colorIndex = 0;
+                let timer = setInterval(function() {
+                    drawCell(node.y, node.x-1, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
+                    colorIndex++;
+                    if (colorIndex === 2) {
+                        clearInterval(timer);
+                    }
+                }, 30);
+            }
 
         }
 
@@ -296,6 +341,16 @@ function findNeighbours (node, matrix) {
         if (cells[node.x][node.y+1] != "wall" && matrix[node.x][node.y+1].closed == false)
         {
             nodes.push(matrix[node.x][node.y+1]);
+            {
+                let colorIndex = 0;
+                let timer = setInterval(function() {
+                    drawCell(node.y+1, node.x, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
+                    colorIndex++;
+                    if (colorIndex === 2) {
+                        clearInterval(timer);
+                    }
+                }, 30);
+            }
         }
 
     }
@@ -305,9 +360,21 @@ function findNeighbours (node, matrix) {
         if (cells[node.x][node.y-1] != "wall" && matrix[node.x][node.y-1].closed == false)
         {
             nodes.push(matrix[node.x][node.y-1]);
+            {
+                let colorIndex = 0;
+                let timer = setInterval(function() {
+                    drawCell(node.y-1, node.x, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
+                    colorIndex++;
+                    if (colorIndex === 2) {
+                        clearInterval(timer);
+                    }
+                }, 30);
+            }
         }
 
     }
+
+
 
     return nodes;
 }
@@ -410,58 +477,62 @@ function solveAStar ()
     start.g = 0;
     start.f = start.g + start.h;
 
-    while (open.length > 0)
+    let timer = setInterval(function()
     {
-        let min = open[0];
-        let minIndex = 0;
-
-        for (let i = 0; i < open.length; i++)
+        if (open.length > 0)
         {
-            if (open[i].f < min.f)
+            let min = open[0];
+            let minIndex = 0;
+
+            for (let i = 0; i < open.length; i++)
             {
-                min = open[i];
-                minIndex = i;
-            }
-        }
-
-        if (min.x == end.x && min.y == end.y)
-        {
-            findPath(matrix, start, end);
-        }
-
-        let node = open[minIndex];
-        node.closed = true;
-
-        let newArray = findNeighbours(node, matrix);
-
-        for (let i = 0; i < newArray.length; i++)
-        {
-            let tentativeScore = min.g + 1;
-
-            if (newArray[i].closed == false)
-            {
-                newArray[i].parent = min;
-                newArray[i].g = tentativeScore;
-                newArray[i].f = newArray[i].g + manhattonMetrics(newArray[i], end);
-                let count = 0;
-
-                for (let j = 0; j < open.length; j++)
+                if (open[i].f < min.f)
                 {
-                    if (open[j] == newArray[i])
+                    min = open[i];
+                    minIndex = i;
+                }
+            }
+
+            if (min.x == end.x && min.y == end.y)
+            {
+                clearInterval(timer);
+                findPath(matrix, start, end);
+            }
+
+            let node = open[minIndex];
+            node.closed = true;
+
+            let newArray = findNeighbours(node, matrix, start);
+
+            for (let i = 0; i < newArray.length; i++)
+            {
+                let tentativeScore = min.g + 1;
+
+                if (newArray[i].closed == false)
+                {
+                    newArray[i].parent = min;
+                    newArray[i].g = tentativeScore;
+                    newArray[i].f = newArray[i].g + manhattonMetrics(newArray[i], end);
+                    let count = 0;
+
+                    for (let j = 0; j < open.length; j++)
                     {
-                        count++;
+                        if (open[j] == newArray[i])
+                        {
+                            count++;
+                        }
+                    }
+
+                    if (count == 0)
+                    {
+                        open.push(newArray[i]);
                     }
                 }
-
-                if (count == 0)
-                {
-                    open.push(newArray[i]);
-                }
             }
-        }
 
-        open.splice(minIndex, 1);
-    }
+            open.splice(minIndex, 1);
+        }
+    }, 100);
 
     if (open.length == 0 && end.f == 0)
     {
