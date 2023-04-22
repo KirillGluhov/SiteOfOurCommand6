@@ -305,7 +305,7 @@ function findNeighbours (node, matrix, start) {
             {
                 let colorIndex = 0;
                 let timer = setInterval(function() {
-                    drawCell(node.y, node.x, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
+                    drawCell(node.y, node.x+1, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
                     colorIndex++;
                     if (colorIndex === 2) {
                         clearInterval(timer);
@@ -324,7 +324,7 @@ function findNeighbours (node, matrix, start) {
             {
                 let colorIndex = 0;
                 let timer = setInterval(function() {
-                    drawCell(node.y, node.x, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
+                    drawCell(node.y, node.x-1, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
                     colorIndex++;
                     if (colorIndex === 2) {
                         clearInterval(timer);
@@ -344,7 +344,7 @@ function findNeighbours (node, matrix, start) {
             {
                 let colorIndex = 0;
                 let timer = setInterval(function() {
-                    drawCell(node.y, node.x, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
+                    drawCell(node.y+1, node.x, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
                     colorIndex++;
                     if (colorIndex === 2) {
                         clearInterval(timer);
@@ -363,7 +363,7 @@ function findNeighbours (node, matrix, start) {
             {
                 let colorIndex = 0;
                 let timer = setInterval(function() {
-                    drawCell(node.y, node.x, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
+                    drawCell(node.y-1, node.x, ["newCell", "potential"][colorIndex], sizeOfCell, ctx);
                     colorIndex++;
                     if (colorIndex === 2) {
                         clearInterval(timer);
@@ -373,6 +373,8 @@ function findNeighbours (node, matrix, start) {
         }
 
     }
+
+
 
     return nodes;
 }
