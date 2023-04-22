@@ -131,7 +131,6 @@ function DCanvas(el) {
 
 let vector = [];
 const d = new DCanvas(document.getElementById('canv'));
-let net = new brain.NeuralNetwork();
 let netJson;
 let train_data = [];
 let weights = [];
@@ -143,8 +142,6 @@ function addNet(input) {
 
     reader.onload = (event) => {
         netJson = JSON.parse(event.target.result);
-
-        net = new brain.NeuralNetwork().fromJSON(netJson);
         }
 
     reader.readAsText(input.files[0]);
@@ -159,17 +156,16 @@ document.addEventListener('keypress', function (e) {
     }
     else if (e.key.toLowerCase() === 'b') {
 
-       // net.train(train_data, { log: true,/* iterations:500*/ });
-
-       
-
         let nn = new NeuralNetwork(2, 2, 2, hidden_layer_weights = [0.15, 0.2, 0.25, 0.3], hidden_layer_bias = 0.35, output_layer_weights = [0.4, 0.45, 0.5, 0.55], output_layer_bias = 0.6);
 
-        //const result = nn.runNet(d.calculate(true),netJson)
+        console.log(netJson);
+        result = nn.predict(d.calculate(true), netJson)
+        console.log(result);
 
-        const result = net.run(d.calculate(false));
+
         let dd = document.querySelector('.dd');
         // dd.innerHTML = Object.values(result);
+        
         let val = Object.values(result);
         let maxInd = -1
         let maxValue = -1
@@ -179,16 +175,24 @@ document.addEventListener('keypress', function (e) {
             let full_procent = val[i] * 100;
             let empty_procent = 100 - full_procent;
 
+    
+
             if (val[i] > maxValue) {
                 maxValue = val[i];
-                maxInd = i;
+                if (i == val.length - 1) maxInd = 0;
+                else
+                maxInd = i+1;
             }
+            if (i == val.length - 1) number = 0;
+            else number = i + 1;
 
             st += `<div class="probabilities">
-                    <div class="numbers">${i}</div> 
+                    <div class="numbers">${number}</div> 
                     <div class="crossbar"><div class="true" style="width: ${full_procent}%"></div><div class="true">${full}</div><div class="false" style="width: ${empty_procent}%"></div></div>
                     </div>`;
         }
+
+        
 
         dd.innerHTML = `<div class="predict">Скорее всего, ваша цифра... это....     вот эта:..<span style="font-size: 30px;color: green">${maxInd}</span></div>` + st;
 

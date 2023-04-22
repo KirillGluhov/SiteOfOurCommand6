@@ -103,34 +103,50 @@ class NeuralNetwork {
         return total_error;
     }
 
-    runNet(input, netJSON) {
-        const output = [];
-
-        // Calculate the output for each layer
-        for (let layerIdx = 0; layerIdx < netJSON.layers.length; layerIdx++) {
-            const layer = netJSON.layers[layerIdx];
-            const layerOutput = [];
-
-            // Calculate the output for each neuron in the layer
-            for (let neuronIdx = 0; neuronIdx < layer.length; neuronIdx++) {
-                const neuron = layer[neuronIdx];
-                let neuronOutput = neuron.bias;
-
-                // Calculate the weighted sum of the inputs
-                for (let i = 0; i < neuron.weights.length; i++) {
-                    neuronOutput += neuron.weights[i] * input[i];
-                }
-
-                // Apply the activation function
-                neuronOutput = 1 / (1 + Math.exp(-neuronOutput));
-                layerOutput.push(neuronOutput);
+    predict(input, neuralNetwork) {
+    let output = input;
+    for (let i = 1; i < neuralNetwork.layers.length; i++) {
+        const layer = neuralNetwork.layers[i];
+        const nextOutput = new Array(layer.size).fill(0);
+        for (let j = 1; j < neuralNetwork.sizes[i]; j++) {
+            let sum = 0;
+            for (let k = 0; k < output.length; k++) {
+                sum += output[k] * layer.weights[j][k];
             }
-
-            input = layerOutput;
-            output.push(layerOutput);
+            nextOutput[j] = 1 / (1 + Math.exp(-sum));
         }
+        output = nextOutput;
+    }
+    return output;
+}
 
-        return output[output.length - 1];
+    runNet(input, neuralNetwork) {
+        let output = input;
+        for (let i = 1; i < neuralNetwork.layers.length; i++) {
+            const layer = neuralNetwork.layers[i];
+            let nextOutput = []; 
+            for (let c = 0; c < layer.size; c++) {
+                nextOutput.push(0);
+            }
+            for (let j = 1; j < neuralNetwork.sizes[i]; j++) {
+                let sum = 0;
+                for (let k = 0; k < output.length; k++) {
+                    sum += output[k] * layer.weights[j][k];
+                }
+                nextOutput[j] = neuralNetwork.activation(sum + layer.biases[j]);
+            }
+            output = nextOutput;
+        }
+        const outputLayer = neuralNetwork.outputLookup;
+        const nextOutput = [0,0,0,0,0,0,0,0,0,0];
+        for (let j = 0; j < outputLayer.size; j++) {
+            let sum = 0;
+            for (let k = 0; k < output.length; k++) {
+                sum += output[k] * outputLayer.weights[j][k];
+            }
+            nextOutput[j] = neuralNetwork.activation(sum + outputLayer.biases[j]);
+        }
+        return nextOutput;
     }
 
 
