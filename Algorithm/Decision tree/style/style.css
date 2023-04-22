@@ -71,6 +71,27 @@ span {
     letter-spacing: 2px;
 }
 
+.container-inner-1 {
+    display: flex;
+    justify-content: center;
+    
+}
+
+.container-inner-1 > textarea {
+    all: unset;
+    padding: 18px;
+    border: solid black 3px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 500;
+    font-size: 20px;
+    background-color: rgb(63, 63, 63);
+    font-family: sans-serif;
+    letter-spacing: 2px;
+    width: 700px;
+    height: 25px;
+}
+
 .informationOfInput {
     margin-top: 50px;
     font-size: 16px;
@@ -146,6 +167,7 @@ table {
 .container {
     display: grid;
 	align-items: center;
+    margin-bottom: 50px;
 }
 
 .tree {
@@ -243,4 +265,17 @@ table {
 }
 .tree li a:hover+ul li::after, .tree li a:hover+ul li::before, .tree li a:hover+ul::before, .tree li a:hover+ul ul::before {
 	border-color: #000000;
+}
+
+
+.userDecison {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
+.buttonOfSaveChoose {
+    margin-left: 130px;
 }
